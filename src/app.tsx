@@ -1,8 +1,15 @@
 import * as React from 'react';
+import {HashRouter, Route} from 'react-router-dom';
+
+import {MainWindow} from './components/MainWindow/MainWindow';
 
 
 
 export default function App()
 {
-	return <h1>Helooo</h1>;
+	return (
+		<HashRouter>
+			<Route path='/MainWindow' component={MainWindow}/>
+		</HashRouter>
+	);
 }

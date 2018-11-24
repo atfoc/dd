@@ -9,5 +9,4 @@ function main()
 	mainWindow.show();
 }
 
-
 app.on('ready', main);
