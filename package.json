@@ -1,0 +1,19 @@
+{
+  "name": "wd-40",
+  "version": "1.0.0",
+  "description": "Application for downloading wallpapers from wallpaperscraft website for your resolution",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atfoc/wd-40.git"
+  },
+  "author": "Pedja Trifunov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atfoc/wd-40/issues"
+  },
+  "homepage": "https://github.com/atfoc/wd-40#readme"
+}
