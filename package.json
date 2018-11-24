@@ -18,7 +18,6 @@
   "bugs": {
     "url": "https://github.com/atfoc/wd-40/issues"
   },
-  "homepage": "https://github.com/atfoc/wd-40#readme",
   "devDependencies": {
     "@types/node": "^10.12.10",
     "@types/react": "^16.7.7",
