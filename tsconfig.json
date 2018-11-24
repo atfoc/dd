@@ -29,6 +29,6 @@
     "src/setupTests.ts"
   ],
   "files": [
-    "src/index.tsx"
+    "src/index.tsx", "main.ts"
   ]
 }
