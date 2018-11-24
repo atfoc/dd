@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "compileMain" : "tsc -t es6 --module commonjs main.ts",
-    "compileAndRun" : "npm run compileMain && npm run run",
+    "compileReact": "react-scripts-ts build",
+    "compileAndRun" : "npm run compileReact && npm run compileMain && npm run run",
     "run" : "electron ."
   },
   "repository": {
