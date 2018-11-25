@@ -4,10 +4,11 @@
   "description": "Application for downloading wallpapers from wallpaperscraft website for your resolution",
   "main": "main.js",
   "scripts": {
-    "compileMain" : "tsc -t es6 --module commonjs main.ts",
+    "compileMain": "tsc -t es6 --module commonjs main.ts",
     "compileReact": "react-scripts-ts build",
-    "compileAndRun" : "npm run compileReact && npm run compileMain && npm run run",
-    "run" : "electron ."
+    "compileAndRun": "npm run compileReact && npm run compileMain && npm run run",
+    "compileReactAndRun": "npm run compileReact && npm run run",
+    "run": "electron ."
   },
   "repository": {
     "type": "git",
@@ -30,6 +31,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "bootstrap": "^4.1.3",
     "node-html-parser": "^1.1.11",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
