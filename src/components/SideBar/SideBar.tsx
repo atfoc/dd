@@ -2,8 +2,7 @@ import './style.css';
 import * as React from 'react';
 import {Button, Col, Row} from "reactstrap";
 
-import axios, {AxiosResponse} from 'axios';
-import {parse} from 'node-html-parser';
+import {WallpaperCraftApi} from '../../utils/WallpaperCraftApi';
 const {screen} = (window as any).require('electron').remote;
 
 import {Props, State} from './State';
@@ -12,7 +11,7 @@ import {CSSProperties} from "react";
 
 class SideBar extends React.Component<Props, State>
 {
-	private url:string;
+	private api : WallpaperCraftApi;
 	constructor(props:Props)
 	{
 		super(props);
@@ -23,7 +22,7 @@ class SideBar extends React.Component<Props, State>
 				categories:[]
 			};
 
-		this.url = 'https://wallpaperscraft.com/';
+		this.api = WallpaperCraftApi.getInstance();
 
 		this.onToggleButtonClicked = this.onToggleButtonClicked.bind(this);
 		this.onResponseReceived = this.onResponseReceived.bind(this);
@@ -34,8 +33,13 @@ class SideBar extends React.Component<Props, State>
 	/*Life cycle methods*/
 	componentDidMount(): void
 	{
-		axios.get(this.url)
-			.then(this.onResponseReceived)
+		this.api.getResolutions()
+			.then((value)=>
+			{
+				 this.api.getCategories()
+					 .then(value1 => this.onResponseReceived(value, value1))
+					 .catch(reason => console.log(reason) );
+			})
 			.catch(reason => console.log(reason) );
 
 	}
@@ -46,40 +50,8 @@ class SideBar extends React.Component<Props, State>
 		this.setState(toggleSideBar);
 	}
 
-	onResponseReceived(response: AxiosResponse<any>)
+	onResponseReceived(resolutions:Array<string>, categories:Array<string>)
 	{
-		let root = parse(response.data);
-		let filters = root.querySelectorAll('.filters');
-		let categories:Array<string> =
-			parse(filters[0].toString() as string )
-				.querySelectorAll('.filter__link')
-				.filter((value :any)=> value.classNames.length === 1)
-				.map((value:any)=>value.childNodes[0].text.trim());
-		let resolutions:Array<string> =
-			parse(filters[1].toString() as string )
-				.querySelectorAll('.filter__link')
-				.filter((value :any)=> value.classNames.length === 1)
-				.map((value:any)=>value.text.trim())
-				.sort((a:string, b:string) =>
-				{
-					let [a1, a2] = a.split('x')
-						.map(value => parseInt(value,10));
-					let [b1, b2] = b.split('x')
-						.map(value => parseInt(value, 10));
-
-					if(a1 < b1)
-					{
-						return -1;
-					}
-					else if(a1 == b1)
-					{
-						return a2 - b2;
-					}
-					else
-					{
-						return 1;
-					}
-				});
 
 		this.setState(setResolutions(resolutions));
 		this.setState(setCategories(categories));
