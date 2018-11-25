@@ -48,7 +48,7 @@ function registerFileProtocol()
 			url = path.join(app.getAppPath(), url);
 		}
 		// Build complete path for node require function
-		console.log(url);
+		//console.log(url);
 
 		// Replace backslashes by forward slashes (windows)
 		// url = url.replace(/\\/g, '/');
