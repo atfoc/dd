@@ -1,0 +1,20 @@
+.sidebar-active
+{
+    width:33vw;
+}
+.sidebar-inactive
+{
+    width: 5rem;
+}
+
+.sidebar
+{
+    transition-property: width;
+    transition-duration: 1s;
+    height:100vh;
+    background-color:gray;
+    padding-right: 5px;
+    overflow-y: auto;
+    overflow-x:hidden;
+}
+
