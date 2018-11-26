@@ -1,6 +1,7 @@
 import {Image} from "../models/Image";
 import {parse} from "node-html-parser";
 import axios from 'axios';
+import {Category} from "../models/Category";
 
 class WallpaperCraftApi
 {
@@ -58,27 +59,29 @@ class WallpaperCraftApi
 		return resolutions;
 	}
 
-	async getCategories(): Promise<Array<string>>
+	async getCategories(): Promise<Array<Category>>
 	{
 		let response = await axios.get(WallpaperCraftApi.baseUrl);
 		let root = parse(response.data);
 		let filters = root.querySelectorAll('.filters');
-		let categories:Array<string> =
+		let categories:Array<Category> =
 			parse(filters[0].toString() as string )
 				.querySelectorAll('.filter__link')
 				.filter((value :any)=> value.classNames.length === 1)
-				.map((value:any)=>value.childNodes[0].text.trim());
+				.map((value:any)=>
+				{
+					console.log(value.attributes.href);
+					return new Category(value.childNodes[0].text.trim(), value.attributes.href);
+				});
 
 		return categories;
 	}
 
-	async getImages(resolution: string, category: string = 'all', page: number = 1):
+	async getImages(resolution: string, category: Category= new Category('All', 'all'), page: number = 1):
 		Promise<Array<Image>>
 	{
-		category = category === 'all' ? category :
-			`catalog/${category.toLowerCase().replace(' ', '_')}`;
 		let response = await axios.get(
-			`${WallpaperCraftApi.baseUrl}/${category}/${resolution}/page${page}`);
+			`${WallpaperCraftApi.baseUrl}${category.link}/${resolution}/page${page}`);
 		let root = parse(response.data);
 		let images = root.querySelectorAll('img.wallpapers__image')
 			.map((value) =>

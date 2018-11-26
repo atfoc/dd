@@ -3,6 +3,8 @@ import {app, protocol, ipcMain} from 'electron';
 import * as path from 'path';
 import * as fs from 'fs';
 import  axios from 'axios';
+import {Channels} from "./src/utils/Channels";
+
 
 let mainWindow : BrowserWindow | null = null;
 
@@ -16,7 +18,7 @@ function main()
 }
 
 app.on('ready', main);
-ipcMain.on('imageDownload',(event:any, url:any, name:any)=>
+ipcMain.on(Channels.downloadImage,(event:any, url:any, name:any)=>
 {
 	if(!(typeof url === 'string'))
 	{
@@ -36,6 +38,9 @@ ipcMain.on('imageDownload',(event:any, url:any, name:any)=>
 			let data:ArrayBuffer = value.data;
 			let downloadFolder = app.getPath('downloads');
 			fs.writeFileSync(path.join(downloadFolder, name),data);
+
+			const nameIndex = name.lastIndexOf('.');
+			event.sender.send(Channels.downloadImage+'Ret', name.substring(0, nameIndex));
 		});
 
 });
