@@ -98,9 +98,9 @@ class WallpaperCraftApi
 		return	`${WallpaperCraftApi.baseImgUrl}/${img.name}_300x168.${img.format}`;
 	}
 
-	getImageUrl(img: Image, resolution: string): string
+	async getImageUrl(img: Image, resolution: string): Promise<string>
 	{
-		return '';
+		return `${WallpaperCraftApi.baseImgUrl}/${img.name}_${resolution}.${img.format}`;
 	}
 }
 
