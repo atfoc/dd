@@ -3,6 +3,7 @@ import {State, Props} from "./State";
 import {setImgUrl} from './State';
 import {WallpaperCraftApi} from '../../utils/WallpaperCraftApi';
 import {Button, Card, CardBody, CardImg, Col, Row} from "reactstrap";
+import {ScaleLoader} from 'react-spinners';
 
 class ImageShow extends React.Component<Props, State>
 {
@@ -53,7 +54,16 @@ class ImageShow extends React.Component<Props, State>
 							<Button color='primary' size='sm'
 									onClick={this.props.onImageDownload}
 							>
-								Download
+								{
+									!this.props.isDownloading?
+										<span className="fas fa-download pl-2 pr-2"/>
+										:
+										<ScaleLoader height={14}
+													 width={2}
+													 radius={2}
+													 color='white'
+										/>
+								}
 							</Button>
 						</Col>
 					</Row>

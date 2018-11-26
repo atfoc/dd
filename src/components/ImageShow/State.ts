@@ -9,6 +9,7 @@ interface Props
 {
 	image:Image;
 	onImageDownload:()=>void;
+	isDownloading:boolean;
 }
 
 type ReturnF<T extends keyof  State> =
