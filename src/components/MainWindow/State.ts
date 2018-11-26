@@ -1,12 +1,14 @@
 import {Image} from "../../models/Image";
+import {Category} from "../../models/Category";
 
 interface State
 {
-	category:string | null;
+	category:Category| null;
 	resolution:string | null;
 	changingSearch:boolean;
 	images:Array<Image>;
 	loadingMoreImages:boolean;
+	downloadingImages:Set<string>;
 }
 
 type Props = {};
@@ -15,7 +17,7 @@ type ReturnValue<T extends keyof State> = Pick<State, T>;
 type ReturnValueF<T extends keyof State> =
 	(state:Readonly<State>, props:Readonly<Props>)=> Pick<State, T>;
 
-function setCategory(category:string) : ReturnValueF<'category'>
+function setCategory(category:Category) : ReturnValueF<'category'>
 {
 	return (state, props)=>
 	{
@@ -63,5 +65,26 @@ function setLoadingImages(value:boolean):ReturnValueF<'loadingMoreImages'>
 	return (state, props) => ({loadingMoreImages:value});
 }
 
+
+function addToDownloadSet(imgName: string ):ReturnValueF<'downloadingImages'>
+{
+	return (state, props) =>
+	{
+		const s:Set<string> = new Set(state.downloadingImages);
+		s.add(imgName);
+		return {downloadingImages:s};
+	};
+}
+
+function removeFromDownloadSet(imgName: string):ReturnValueF<'downloadingImages'>
+{
+	return (state, props) =>
+	{
+		const s:Set<string> = new Set(state.downloadingImages);
+		s.delete(imgName);
+		return {downloadingImages:s}
+	};
+}
+
 export {State, Props, setCategory, setResolution, setChanging,
-	addImages, clearImages, setLoadingImages};
+	addImages, clearImages, setLoadingImages, addToDownloadSet, removeFromDownloadSet};
