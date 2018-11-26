@@ -1,6 +1,6 @@
 import './style.css';
 import * as React from 'react';
-import {Button, Col, Row} from "reactstrap";
+import {Col, Row} from "reactstrap";
 
 import {WallpaperCraftApi} from '../../utils/WallpaperCraftApi';
 const {screen} = (window as any).require('electron').remote;
@@ -8,6 +8,7 @@ const {screen} = (window as any).require('electron').remote;
 import {Props, State} from './State';
 import {toggleSideBar, setCategories, setResolutions} from './State';
 import {CSSProperties} from "react";
+import {Category} from "../../models/Category";
 
 class SideBar extends React.Component<Props, State>
 {
@@ -50,8 +51,12 @@ class SideBar extends React.Component<Props, State>
 		this.setState(toggleSideBar);
 	}
 
-	onResponseReceived(resolutions:Array<string>, categories:Array<string>)
+	onResponseReceived(resolutions:Array<string>, categories:Array<Category>)
 	{
+
+		categories = [new Category('All', '/all'), ...categories,
+			new Category('Random', '/all')]
+			.sort((a, b) =>a.name.localeCompare(b.name));
 
 		this.setState(setResolutions(resolutions));
 		this.setState(setCategories(categories));
@@ -79,9 +84,20 @@ class SideBar extends React.Component<Props, State>
 		}
 	}
 
-	onCategoryChange(category:string):void
+	onCategoryChange(category:Category):void
 	{
-		this.props.onCategoryChange(category);
+		if(category.name === 'Random')
+		{
+			this.props.onCategoryChange(()=>
+			{
+				const rand = Math.floor(Math.random()*this.state.categories.length);
+				return this.state.categories[rand];
+			})
+		}
+		else
+		{
+			this.props.onCategoryChange(category);
+		}
 	}
 
 	/*Render code*/
@@ -122,7 +138,7 @@ class SideBar extends React.Component<Props, State>
 				<Row className='mt-2 justify-content-center'>
 					<Col xs='auto' style={selected}
 						 onClick={this.onCategoryChange.bind(this, value)}>
-						{value}
+						{value.name}
 					</Col>
 				</Row>
 			);
@@ -143,11 +159,21 @@ class SideBar extends React.Component<Props, State>
 			<div className={`sidebar ${sidebarActivation}`}>
 				<Row className='justify-content-end'>
 					<Col xs='auto'>
-						<Button
-							onClick={this.onToggleButtonClicked}
-						>
-							Toggle
-						</Button>
+						{
+							this.state.opened ?
+								<span style={{cursor:'pointer', color:'white'}}
+									  onClick={this.onToggleButtonClicked}
+									  className='fas fa-times fa-2x'
+									  color='white'
+								/>
+								:
+								<span style={{cursor:'pointer', color:'white'}}
+									  onClick={this.onToggleButtonClicked}
+									  className='fas fa-bars fa-2x'
+							/>
+						}
+
+
 					</Col>
 				</Row>
 

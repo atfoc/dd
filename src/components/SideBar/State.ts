@@ -1,16 +1,18 @@
+import {Category} from "../../models/Category";
+
 interface State
 {
 	opened:boolean;
-	categories:Array<string>;
+	categories:Array<Category>;
 	resolutions:Array<string>;
 }
 
 interface Props
 {
 	resolution:string | null;
-	category:string | null;
+	category:Category| null;
 	onResolutionChange: (resolution: string)=>void;
-	onCategoryChange: (category:string)=>void;
+	onCategoryChange: (category:Category|(()=>Category))=>void;
 }
 
 type ReturnValue<T extends keyof State> = Pick<State, T>
@@ -22,7 +24,7 @@ function toggleSideBar(state:Readonly<State>, props:Readonly<Props>):ReturnValue
 	return {opened:!state.opened};
 }
 
-function setCategories(categories:Array<string>):ReturnValueF<'categories'>
+function setCategories(categories:Array<Category>):ReturnValueF<'categories'>
 {
 	return (state, props) => ({categories:categories});
 }
