@@ -3,6 +3,7 @@ import * as React from 'react';
 import {State, Props, setLoadingImages} from './State';
 import {setCategory, setResolution, setChanging, addImages, clearImages} from './State';
 import {WallpaperCraftApi} from '../../utils/WallpaperCraftApi';
+const ipcRenderer= (window as any).require('electron').ipcRenderer;
 
 import {Col, Container, Row} from "reactstrap";
 import {SideBar} from "../SideBar/SideBar";
@@ -94,13 +95,26 @@ class MainWindow extends React.Component<Props, State>
 		this.setState(setLoadingImages(false));
 	}
 
+	onImageDownload(index:number)
+	{
+		if(this.state.resolution)
+		{
+			this.api.getImageUrl(this.state.images[index], this.state.resolution)
+				.then(value => ipcRenderer.send('imageDownload', value,
+					`${this.state.images[index].name}.${this.state.images[index].format}`))
+				.catch(reason => console.log(reason));
+		}
+	}
+
 	/*Render code*/
 
 	renderImages():React.ReactNode
 	{
-		const images = this.state.images.map(value => (
+		const images = this.state.images.map((value,index) => (
 				<Col  sm='12' md='6' lg='4' className='mt-2'>
-					<ImageShow image={value}/>
+					<ImageShow image={value}
+							   onImageDownload={()=>this.onImageDownload(index)}
+					/>
 				</Col>
 			));
 
