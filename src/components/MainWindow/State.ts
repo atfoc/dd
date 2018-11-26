@@ -4,8 +4,9 @@ interface State
 {
 	category:string | null;
 	resolution:string | null;
-	loading:boolean;
+	changingSearch:boolean;
 	images:Array<Image>;
+	loadingMoreImages:boolean;
 }
 
 type Props = {};
@@ -30,9 +31,9 @@ function setResolution(resolution:string):ReturnValueF<'resolution'>
 	};
 }
 
-function setLoading(value:boolean):ReturnValueF<'loading'>
+function setChanging(value:boolean):ReturnValueF<'changingSearch'>
 {
-	return (state, props) => ({loading:value});
+	return (state, props) => ({changingSearch:value});
 
 }
 
@@ -57,4 +58,10 @@ function clearImages(state:Readonly<State>, props:Readonly<Props>):ReturnValue<'
 	return {images:[]};
 }
 
-export {State, Props, setCategory, setResolution, setLoading, addImages, clearImages};
+function setLoadingImages(value:boolean):ReturnValueF<'loadingMoreImages'>
+{
+	return (state, props) => ({loadingMoreImages:value});
+}
+
+export {State, Props, setCategory, setResolution, setChanging,
+	addImages, clearImages, setLoadingImages};

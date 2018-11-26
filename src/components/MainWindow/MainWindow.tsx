@@ -1,12 +1,13 @@
 import './style.css';
 import * as React from 'react';
-import {State, Props} from './State';
-import {setCategory, setResolution, setLoading, addImages, clearImages} from './State';
+import {State, Props, setLoadingImages} from './State';
+import {setCategory, setResolution, setChanging, addImages, clearImages} from './State';
 import {WallpaperCraftApi} from '../../utils/WallpaperCraftApi';
 
 import {Col, Container, Row} from "reactstrap";
 import {SideBar} from "../SideBar/SideBar";
 import {ImageShow} from '../ImageShow/ImageShow';
+import {InfiniteScroll} from '../InfiniteScroll/InfiniteScroll';
 
 import {Image} from "../../models/Image";
 
@@ -15,6 +16,8 @@ class MainWindow extends React.Component<Props, State>
 
 	private api:WallpaperCraftApi;
 	private onReloadImages:()=>void;
+	private currentPage:number;
+	private onLoadNext:()=>void;
 
 	constructor(props:Props)
 	{
@@ -24,31 +27,47 @@ class MainWindow extends React.Component<Props, State>
 			{
 				category:null,
 				resolution:null,
-				loading:false,
-				images:[]
+				changingSearch:false,
+				images:[],
+				loadingMoreImages:true
 			};
 
 		this.api = WallpaperCraftApi.getInstance();
+		this.currentPage = 0;
 
 		this.onCategoryChange = this.onCategoryChange.bind(this);
 		this.onResolutionChange = this.onResolutionChange.bind(this);
 		this.onImagesRecived = this.onImagesRecived.bind(this);
-		this.onReloadImages = this.onGetMoreImages.bind(this, 1);
+		this.onReloadImages = this.onGetMoreImages.bind(this, 0);
+		this.onLoadNext = this.onGetMoreImages.bind(this, 1);
 	}
 
 
 
 	/*View code*/
-	onGetMoreImages(page:number)
+	onGetMoreImages(direction:number)
 	{
 		if(this.state.resolution && this.state.category)
 		{
-			this.api.getImages(this.state.resolution, this.state.category, page)
+			if(direction === 0)
+			{
+				this.currentPage = 1;
+			}
+			else if(direction > 0)
+			{
+				++this.currentPage;
+			}
+			else
+			{
+				/*load previous page*/
+			}
+			this.setState(setLoadingImages(true));
+			this.api.getImages(this.state.resolution, this.state.category, this.currentPage)
 				.then(this.onImagesRecived)
 				.catch(reason =>
 				{
 					console.log(reason);
-					this.setState(setLoading(false));
+					this.setState(setChanging(false));
 				});
 		}
 	}
@@ -56,14 +75,14 @@ class MainWindow extends React.Component<Props, State>
 	onCategoryChange(category: string):void
 	{
 		this.setState(setCategory(category));
-		this.setState(setLoading(true));
+		this.setState(setChanging(true));
 		this.setState(clearImages, this.onReloadImages);
 	}
 
 	onResolutionChange(resolution:string):void
 	{
 		this.setState(setResolution(resolution));
-		this.setState(setLoading(true));
+		this.setState(setChanging(true));
 		this.setState(clearImages, this.onReloadImages);
 
 	}
@@ -71,7 +90,8 @@ class MainWindow extends React.Component<Props, State>
 	onImagesRecived(images:Array<Image>):void
 	{
 		this.setState(addImages(images));
-		this.setState(setLoading(false));
+		this.setState(setChanging(false));
+		this.setState(setLoadingImages(false));
 	}
 
 	/*Render code*/
@@ -93,7 +113,7 @@ class MainWindow extends React.Component<Props, State>
 
 	render(): React.ReactNode
 	{
-		const blocked = this.state.loading ? 'mainwindow-blocker' : '';
+		const blocked = this.state.changingSearch ? 'mainwindow-blocker' : '';
 
 		return (
 			<React.Fragment>
@@ -108,9 +128,27 @@ class MainWindow extends React.Component<Props, State>
 							/>
 						</Col>
 						<Col className='mainwindow-mainlayout' style={{width:'100vh'}}>
+							<InfiniteScroll hasMore={true}
+											loading={this.state.loadingMoreImages}
+											height='100vh'
+											loadNext={this.onLoadNext}
+											loadPrev={() => {}}
+											ender=
+												{
+													<div style={{textAlign:'center'}}>
+														end
+													</div>}
+											loader=
+												{
+													<div style={{textAlign:'center'}}>
+														Loading...
+													</div>
+												}
+							>
 								<Row className='mt-2'>
 									{this.renderImages()}
 								</Row>
+							</InfiniteScroll>
 						</Col>
 					</Row>
 				</Container>
