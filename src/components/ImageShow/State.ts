@@ -8,6 +8,7 @@ interface State
 interface Props
 {
 	image:Image;
+	onImageDownload:()=>void;
 }
 
 type ReturnF<T extends keyof  State> =

@@ -2,10 +2,12 @@ import * as React from 'react';
 import {State, Props} from "./State";
 import {setImgUrl} from './State';
 import {WallpaperCraftApi} from '../../utils/WallpaperCraftApi';
+import {Button, Card, CardBody, CardImg, Col, Row} from "reactstrap";
 
 class ImageShow extends React.Component<Props, State>
 {
 	private api:WallpaperCraftApi;
+
 	constructor(props:Props)
 	{
 		super(props);
@@ -17,8 +19,10 @@ class ImageShow extends React.Component<Props, State>
 
 		this.api = WallpaperCraftApi.getInstance();
 
+
 	}
 
+	/*Life cycle code*/
 	componentDidUpdate(prevProps: Readonly<Props>): void
 	{
 		/*Careful this may be multiple rerender because of async nature of react*/
@@ -31,6 +35,8 @@ class ImageShow extends React.Component<Props, State>
 		}
 	}
 
+
+	/*Render code*/
 	render(): React.ReactNode
 	{
 		if(this.state.imgUrl === '')
@@ -39,7 +45,20 @@ class ImageShow extends React.Component<Props, State>
 		}
 
 		return (
-			<img src={this.state.imgUrl}/>
+			<Card style={{width:'300px'}}>
+				<CardImg top width='300px' src={this.state.imgUrl}/>
+				<CardBody>
+					<Row className='justify-content-end'>
+						<Col xs='auto'>
+							<Button color='primary' size='sm'
+									onClick={this.props.onImageDownload}
+							>
+								Download
+							</Button>
+						</Col>
+					</Row>
+				</CardBody>
+			</Card>
 		);
 	}
 }
