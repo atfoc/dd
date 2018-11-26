@@ -1,6 +1,9 @@
 import {BrowserWindow} from 'electron';
-import {app, protocol} from 'electron';
+import {app, protocol, ipcMain} from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
+import  axios from 'axios';
+
 let mainWindow : BrowserWindow | null = null;
 
 function main()
@@ -13,7 +16,29 @@ function main()
 }
 
 app.on('ready', main);
+ipcMain.on('imageDownload',(event:any, url:any, name:any)=>
+{
+	if(!(typeof url === 'string'))
+	{
+		return;
+	}
+	if(!(typeof name === 'string'))
+	{
+		return ;
+	}
 
+	axios.get(url,
+	{
+		responseType:'arraybuffer'
+	})
+		.then(value =>
+		{
+			let data:ArrayBuffer = value.data;
+			let downloadFolder = app.getPath('downloads');
+			fs.writeFileSync(path.join(downloadFolder, name),data);
+		});
+
+});
 
 /**
  * This function intercept file: protocol
