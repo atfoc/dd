@@ -3,6 +3,7 @@ import * as React from 'react';
 import {State, Props, setLoadingImages} from './State';
 import {setCategory, setResolution, setChanging, addImages, clearImages} from './State';
 import {addToDownloadSet, removeFromDownloadSet} from './State';
+import {prepandImages, removeLastImages, removeFirstImages} from './State';
 import {WallpaperCraftApi} from '../../utils/WallpaperCraftApi';
 import {downloadImage} from '../../utils/SystemApi';
 import {Channels} from "../../utils/Channels";
@@ -21,10 +22,15 @@ class MainWindow extends React.Component<Props, State>
 {
 
 	private api:WallpaperCraftApi;
-	private onReloadImages:()=>void;
-	private currentPage:number;
-	private onLoadNext:()=>void;
+	private readonly onReloadImages:()=>void;
+	private readonly onLoadNext:()=>void;
+	private readonly onLoadPrev:()=>void;
 	private randomCategory:(()=>Category) | null;
+	private firstPageLoaded:number;
+	private lastPageLoaded:number;
+	private static numOfPagesLoaded:number;
+	private static numOfImagesPerPage:number;
+	private prevCategories:Array<Category>;
 
 	constructor(props:Props)
 	{
@@ -41,14 +47,18 @@ class MainWindow extends React.Component<Props, State>
 			};
 
 		this.api = WallpaperCraftApi.getInstance();
-		this.currentPage = 0;
 		this.randomCategory = null;
+		this.firstPageLoaded = 0;
+		this.lastPageLoaded = 0;
+		this.prevCategories = [];
+		MainWindow.numOfPagesLoaded = 5;
+		MainWindow.numOfImagesPerPage = 15;
 
 		this.onCategoryChange = this.onCategoryChange.bind(this);
 		this.onResolutionChange = this.onResolutionChange.bind(this);
-		this.onImagesRecived = this.onImagesRecived.bind(this);
 		this.onReloadImages = this.onGetMoreImages.bind(this, 0);
 		this.onLoadNext = this.onGetMoreImages.bind(this, 1);
+		this.onLoadPrev = this.onGetMoreImages.bind(this, -1);
 		this.onImageFinishedDownload = this.onImageFinishedDownload.bind(this);
 	}
 
@@ -69,33 +79,67 @@ class MainWindow extends React.Component<Props, State>
 	{
 		if(this.state.resolution && this.state.category)
 		{
+			let pageToLoad = 0;
+			let cat  = this.state.category;
+
 			if(direction === 0)
 			{
-				this.currentPage = 1;
+				/*Todo load MainWindow.numOfPagesLoaded instead of one*/
+				this.firstPageLoaded = 1;
+				this.lastPageLoaded = 1;
+				pageToLoad = this.firstPageLoaded;
+
 			}
 			else if(direction > 0)
 			{
-				++this.currentPage;
+				/*TODO:check if next page exists*/
+				++this.lastPageLoaded;
+				if(this.lastPageLoaded - this.firstPageLoaded > MainWindow.numOfPagesLoaded)
+				{
+					++this.firstPageLoaded;
+				}
+				pageToLoad = this.lastPageLoaded;
+
 			}
 			else
 			{
-				/*load previous page*/
+				if(this.firstPageLoaded <= 1)
+				{
+					console.log('Cant load before first page');
+					return;
+				}
+
+				--this.firstPageLoaded;
+				if(this.lastPageLoaded - this.firstPageLoaded > MainWindow.numOfPagesLoaded)
+				{
+					--this.lastPageLoaded;
+				}
+				pageToLoad = this.firstPageLoaded;
 			}
 			this.setState(setLoadingImages(true));
-			let cat  = this.state.category;
 			if(this.randomCategory)
 			{
-				cat = this.randomCategory();
+				if(pageToLoad <= this.prevCategories.length)
+				{
+					cat = this.prevCategories[pageToLoad-1]
+				}
+				else
+				{
+					cat = this.randomCategory();
+					this.prevCategories.push(cat);
+				}
 				this.setState(setCategory(cat));
 			}
 
-			this.api.getImages(this.state.resolution, cat, this.currentPage)
-				.then(this.onImagesRecived)
+			this.api.getImages(this.state.resolution, cat, pageToLoad)
+				.then(value => this.onImagesRecived(value, direction))
 				.catch(reason =>
 				{
 					console.log(reason);
 					this.setState(setChanging(false));
 				});
+
+			console.log(`first:${this.firstPageLoaded} last:${this.lastPageLoaded}`);
 		}
 	}
 
@@ -122,9 +166,23 @@ class MainWindow extends React.Component<Props, State>
 
 	}
 
-	onImagesRecived(images:Array<Image>):void
+	onImagesRecived(images:Array<Image>, direction:number):void
 	{
-		this.setState(addImages(images));
+		if(direction < 0)
+		{
+			this.setState(prepandImages(images));
+			this.setState(removeLastImages(MainWindow.numOfImagesPerPage));
+
+		}
+		else if(direction > 0 && this.lastPageLoaded - this.firstPageLoaded>= MainWindow.numOfPagesLoaded)
+		{
+			this.setState(addImages(images));
+			this.setState(removeFirstImages(MainWindow.numOfImagesPerPage));
+		}
+		else
+		{
+			this.setState(addImages(images))
+		}
 		this.setState(setChanging(false));
 		this.setState(setLoadingImages(false));
 	}
@@ -184,11 +242,13 @@ class MainWindow extends React.Component<Props, State>
 							/>
 						</Col>
 						<Col className='mainwindow-mainlayout' style={{width:'100vh'}}>
-							<InfiniteScroll hasMore={true}
+							<InfiniteScroll hasNext={true}
+											hasPrev={this.firstPageLoaded > 1}
 											loading={this.state.loadingMoreImages}
 											height='100vh'
 											loadNext={this.onLoadNext}
-											loadPrev={() => {}}
+											loadPrev={this.onLoadPrev}
+											numberOfLoadedPages={MainWindow.numOfPagesLoaded}
 											ender=
 												{
 													<div style={{textAlign:'center'}}>
@@ -196,7 +256,7 @@ class MainWindow extends React.Component<Props, State>
 													</div>}
 											loader=
 												{
-													<div style={{textAlign:'center'}}>
+													<div style={{textAlign:'center'}} >
 														Loading...
 													</div>
 												}

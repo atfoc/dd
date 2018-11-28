@@ -11,6 +11,9 @@ import {State, Props} from './State';
 class InfiniteScroll extends React.Component<Props, State>
 {
 
+	private prevOffset:number;
+	private direction: number;
+
 	constructor(props:Props)
 	{
 		super(props);
@@ -20,6 +23,8 @@ class InfiniteScroll extends React.Component<Props, State>
 
 			};
 
+		this.prevOffset = 0;
+		this.direction = 0;
 
 		this.onScroll = this.onScroll.bind(this);
 	}
@@ -32,10 +37,30 @@ class InfiniteScroll extends React.Component<Props, State>
 	{
 		let div:HTMLDivElement = event.target;
 
-		if(!this.props.loading && this.props.hasMore &&
-			div.scrollHeight == div.scrollTop + div.clientHeight)
+		this.direction =   div.scrollTop - this.prevOffset;
+		this.prevOffset = div.scrollTop;
+
+		if(this.direction < 0)
 		{
-			this.props.loadNext();
+			if(div.scrollTop === 0 && !this.props.loading && this.props.hasPrev)
+			{
+				this.props.loadPrev();
+				//div.scrollBy(0, 5);
+				div.scrollBy(0, div.scrollHeight/this.props.numberOfLoadedPages+10);
+			}
+		}
+		else if(this.direction > 0)
+		{
+			if(div.scrollTop + div.clientHeight === div.scrollHeight &&
+				!this.props.loading && this.props.hasNext)
+			{
+				this.props.loadNext();
+				div.scrollBy(0, -div.scrollHeight/this.props.numberOfLoadedPages);
+			}
+		}
+		else
+		{
+			console.log('I dont know what direction are you scrolling');
 		}
 	}
 
@@ -46,9 +71,13 @@ class InfiniteScroll extends React.Component<Props, State>
 			<div style={{height:this.props.height,overflowY:'auto', overflowX:'hidden'}}
 				 onScroll={this.onScroll}
 			>
+				{
+					this.props.loading && this.props.loader && this.direction < 0 &&
+					this.props.loader
+				}
 				{this.props.children}
 				{
-					this.props.loading && this.props.loader &&
+					this.props.loading && this.props.loader && this.direction > 0 &&
 					this.props.loader
 				}
 			</div>

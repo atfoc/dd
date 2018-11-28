@@ -55,6 +55,39 @@ function addImages(images: Array<Image> | Image):ReturnValueF<'images'>
 	};
 }
 
+function prepandImages(images:Array<Image>|Image):ReturnValueF<'images'>
+{
+	return (state, props) =>
+	{
+		if(images instanceof Array)
+		{
+			return {images:[...images, ...state.images ]};
+		}
+		else
+		{
+			return {images:[images, ...state.images]};
+		}
+	};
+}
+
+function removeFirstImages(n: number):ReturnValueF<'images'>
+{
+	return (state, props)=>
+	{
+		const post = state.images.slice(n);
+		return {images:post};
+	};
+}
+
+function removeLastImages(n: number):ReturnValueF<'images'>
+{
+	return (state, props)=>
+	{
+		const post = state.images.slice(0, state.images.length - n);
+		return {images:post};
+	};
+}
+
 function clearImages(state:Readonly<State>, props:Readonly<Props>):ReturnValue<'images'>
 {
 	return {images:[]};
@@ -87,4 +120,5 @@ function removeFromDownloadSet(imgName: string):ReturnValueF<'downloadingImages'
 }
 
 export {State, Props, setCategory, setResolution, setChanging,
-	addImages, clearImages, setLoadingImages, addToDownloadSet, removeFromDownloadSet};
+	addImages, clearImages, setLoadingImages, addToDownloadSet, removeFromDownloadSet,
+	prepandImages, removeFirstImages, removeLastImages};

@@ -10,10 +10,12 @@ interface Props
 	loadNext:()=>void;
 	loadPrev:()=>void;
 	loading:boolean;
-	hasMore:boolean;
+	hasNext:boolean;
+	hasPrev:boolean;
 	height:number|string;
 	loader?:React.ReactNode;
 	ender?:React.ReactNode;
+	numberOfLoadedPages:number;
 }
 
 
