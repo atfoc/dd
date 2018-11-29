@@ -243,7 +243,8 @@ class MainWindow extends React.Component<Props, State>
 									 onResolutionChange={this.onResolutionChange}
 							/>
 						</Col>
-						<Col className='mainwindow-mainlayout' style={{width:'100vh'}}>
+						<Col className='mainwindow-mainlayout' style={{width:'100vh',
+							overflow:'hidden'}}>
 							<InfiniteScroll hasNext={true}
 											hasPrev={this.firstPageLoaded > 1}
 											loading={this.state.loadingMoreImages}

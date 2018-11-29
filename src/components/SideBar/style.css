@@ -1,16 +1,16 @@
 .sidebar-active
 {
-    width:33vw;
+    width:11rem;
 }
 .sidebar-inactive
 {
-    width: 5rem;
+    width: 4rem;
 }
 
 .sidebar
 {
     transition-property: width;
-    transition-duration: 1s;
+    transition-duration: 500ms;
     height:100vh;
     background-color:gray;
     padding-right: 5px;
