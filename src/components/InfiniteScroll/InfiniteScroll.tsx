@@ -72,7 +72,7 @@ class InfiniteScroll extends React.Component<Props, State>
 				 onScroll={this.onScroll}
 			>
 				{
-					this.props.loading && this.props.loader && this.direction < 0 &&
+					this.props.loading && this.props.loader && this.direction <= 0 &&
 					this.props.loader
 				}
 				{this.props.children}

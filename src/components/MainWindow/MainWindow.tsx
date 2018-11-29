@@ -16,6 +16,7 @@ import {InfiniteScroll} from '../InfiniteScroll/InfiniteScroll';
 
 import {Image} from "../../models/Image";
 import {Category} from "../../models/Category";
+import {ScaleLoader} from "react-spinners";
 
 
 class MainWindow extends React.Component<Props, State>
@@ -214,6 +215,7 @@ class MainWindow extends React.Component<Props, State>
 					<ImageShow image={value}
 							   onImageDownload={()=>this.onImageDownload(index)}
 							   isDownloading={this.state.downloadingImages.has(value.name)}
+							   key={value.name}
 					/>
 				</Col>
 			));
@@ -256,8 +258,30 @@ class MainWindow extends React.Component<Props, State>
 													</div>}
 											loader=
 												{
-													<div style={{textAlign:'center'}} >
-														Loading...
+													<div style={
+													{
+														paddingTop:'39vh',
+														paddingBottom:'39vh',
+														paddingLeft:'39vw',
+														paddingRight:'39vw',
+														position: 'absolute',
+														top: 0,
+														left: 0,
+														zIndex: 99,
+														backgroundColor: 'rgba(0, 0, 0, 0.8)'
+													}}
+													className='align-content-center'
+													>
+
+													<div style={{width:'20vw', height:'20vh'}}>
+													<ScaleLoader height={5}
+																 heightUnit={'vh'}
+																 width={3}
+																 widthUnit={'vw'}
+																 radius={2}
+																 color='white'
+													/>
+													</div>
 													</div>
 												}
 							>
