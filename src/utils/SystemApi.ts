@@ -5,7 +5,7 @@ import {WallpaperCraftApi} from "./WallpaperCraftApi";
 const ipcRenderer = (window as any).require('electron').ipcRenderer;
 
 
-function downloadImage(img: Image, resolution: string)
+function downloadImage(img: Image, resolution: string):void
 {
 	let api = WallpaperCraftApi.getInstance();
 	api.getImageUrl(img, resolution)
@@ -17,4 +17,9 @@ function downloadImage(img: Image, resolution: string)
 		.catch(reason => console.log(reason));
 }
 
-export {downloadImage};
+function loadImagesFromDb():void
+{
+	ipcRenderer.send(Channels.loadImagesFromDb);
+}
+
+export {downloadImage, loadImagesFromDb};

@@ -20,6 +20,7 @@
     "url": "https://github.com/atfoc/wd-40/issues"
   },
   "devDependencies": {
+    "@types/nedb": "^1.8.6",
     "@types/node": "^10.12.10",
     "@types/react": "^16.7.7",
     "@types/react-dom": "^16.0.10",
@@ -32,6 +33,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "bootstrap": "^4.1.3",
+    "nedb": "^1.8.0",
     "node-html-parser": "^1.1.11",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",

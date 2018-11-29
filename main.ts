@@ -4,13 +4,17 @@ import * as path from 'path';
 import * as fs from 'fs';
 import  axios from 'axios';
 import {Channels} from "./src/utils/Channels";
+import * as Datastore from 'nedb';
 
 
 let mainWindow : BrowserWindow | null = null;
+let db : Datastore | null;
 
 function main()
 {
 	registerFileProtocol();
+	setUpDb();
+
 	mainWindow = new BrowserWindow();
 	mainWindow.loadURL("file://build/index.html#/MainWindow");
 	mainWindow.show();
@@ -18,6 +22,7 @@ function main()
 }
 
 app.on('ready', main);
+
 ipcMain.on(Channels.downloadImage,(event:any, url:any, name:any)=>
 {
 	if(!(typeof url === 'string'))
@@ -43,6 +48,27 @@ ipcMain.on(Channels.downloadImage,(event:any, url:any, name:any)=>
 			event.sender.send(Channels.downloadImage+'Ret', name.substring(0, nameIndex));
 		});
 
+	if(db)
+	{
+		/*Update db to add new image*/
+	}
+
+});
+
+ipcMain.on(Channels.loadImagesFromDb, (event:any)=>
+{
+	if(db)
+	{
+		const values = db.find({}, {name:1}, (err, d)=>
+		{
+			if(err)
+			{
+				console.log(err);
+				return ;
+			}
+			event.sender.send(Channels.loadImagesFromDb+'Ret', d);
+		});
+	}
 });
 
 /**
@@ -87,4 +113,37 @@ function registerFileProtocol()
 		callback(url);
 	});
 
+}
+
+function setUpDb()
+{
+	const appData = app.getPath('userData');
+
+	if(!fs.existsSync(appData))
+	{
+		fs.mkdirSync(appData);
+		console.log(`Did not find appData:${appData}`);
+		console.log(`Creating ${appData}`);
+	}
+
+	db = new Datastore(path.join(appData, 'db'));
+	db.loadDatabase();
+	if(!fs.existsSync(path.join(appData, 'db')))
+	{
+		db.ensureIndex({fieldName:'images.name', unique:true}, (err:Error)=>
+		{
+			if(err)
+			{
+				console.log(err);
+			}
+		});
+
+		db.insert({images:[]}, (err, d)=>
+		{
+			if(err)
+			{
+				console.log(err);
+			}
+		});
+	}
 }
