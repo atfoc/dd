@@ -70,7 +70,6 @@ class WallpaperCraftApi
 				.filter((value :any)=> value.classNames.length === 1)
 				.map((value:any)=>
 				{
-					console.log(value.attributes.href);
 					return new Category(value.childNodes[0].text.trim(), value.attributes.href);
 				});
 
