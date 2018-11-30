@@ -9,6 +9,7 @@ interface State
 	images:Array<Image>;
 	loadingMoreImages:boolean;
 	downloadingImages:Set<string>;
+	allDownloadedImages:Set<string>;
 }
 
 type Props = {};
@@ -109,7 +110,8 @@ function addToDownloadSet(imgName: string ):ReturnValueF<'downloadingImages'>
 	};
 }
 
-function removeFromDownloadSet(imgName: string):ReturnValueF<'downloadingImages'>
+function removeFromDownloadSet(imgName: string)
+	:ReturnValueF<'downloadingImages'>
 {
 	return (state, props) =>
 	{
@@ -119,6 +121,16 @@ function removeFromDownloadSet(imgName: string):ReturnValueF<'downloadingImages'
 	};
 }
 
+function addToAllDownloadedImagesSet(imgName:string):ReturnValueF<'allDownloadedImages'>
+{
+	return (state, props) =>
+	{
+		//const s1:Set<string> = new Set(state.allDownloadedImages);
+		state.allDownloadedImages.add(imgName);
+		return {allDownloadedImages:state.allDownloadedImages};
+	};
+}
+
 export {State, Props, setCategory, setResolution, setChanging,
 	addImages, clearImages, setLoadingImages, addToDownloadSet, removeFromDownloadSet,
-	prepandImages, removeFirstImages, removeLastImages};
+	prepandImages, removeFirstImages, removeLastImages, addToAllDownloadedImagesSet};

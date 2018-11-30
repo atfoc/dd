@@ -1,11 +1,11 @@
 import './style.css';
 import * as React from 'react';
-import {State, Props, setLoadingImages} from './State';
+import {State, Props, setLoadingImages, addToAllDownloadedImagesSet} from './State';
 import {setCategory, setResolution, setChanging, addImages, clearImages} from './State';
 import {addToDownloadSet, removeFromDownloadSet} from './State';
 import {prepandImages, removeLastImages, removeFirstImages} from './State';
 import {WallpaperCraftApi} from '../../utils/WallpaperCraftApi';
-import {downloadImage} from '../../utils/SystemApi';
+import {downloadImage, loadImagesFromDb} from '../../utils/SystemApi';
 import {Channels} from "../../utils/Channels";
 const ipcRenderer = (window as any).require('electron').ipcRenderer;
 
@@ -44,7 +44,8 @@ class MainWindow extends React.Component<Props, State>
 				changingSearch:false,
 				images:[],
 				loadingMoreImages:true,
-				downloadingImages:new Set()
+				downloadingImages:new Set(),
+				allDownloadedImages: new Set()
 			};
 
 		this.api = WallpaperCraftApi.getInstance();
@@ -67,11 +68,30 @@ class MainWindow extends React.Component<Props, State>
 	componentDidMount(): void
 	{
 		ipcRenderer.on(Channels.downloadImage+'Ret', this.onImageFinishedDownload);
+		ipcRenderer.on(Channels.loadImagesFromDb+'Ret', (event:any, images:any)=>
+		{
+			if(!images)
+			{
+				console.log('noooo');
+				return;
+			}
+			for(let img of images)
+			{
+				if(typeof(img) === 'string')
+				{
+					this.setState(addToAllDownloadedImagesSet(img));
+					console.log(`Added ${img}`);
+				}
+			}
+		});
+
+		loadImagesFromDb();
 	}
 
 	componentWillUnmount(): void
 	{
 		ipcRenderer.removeAllListeners(Channels.downloadImage+'Ret');
+		ipcRenderer.removeAllListeners(Channels.loadImagesFromDb+'Ret');
 	}
 
 
@@ -140,7 +160,6 @@ class MainWindow extends React.Component<Props, State>
 					this.setState(setChanging(false));
 				});
 
-			console.log(`first:${this.firstPageLoaded} last:${this.lastPageLoaded}`);
 		}
 	}
 
@@ -204,6 +223,11 @@ class MainWindow extends React.Component<Props, State>
 			return ;
 		}
 		this.setState(removeFromDownloadSet(name));
+
+		if(!this.state.allDownloadedImages.has(name))
+		{
+			this.setState(addToAllDownloadedImagesSet(name));
+		}
 	}
 
 	/*Render code*/
@@ -216,6 +240,7 @@ class MainWindow extends React.Component<Props, State>
 							   onImageDownload={()=>this.onImageDownload(index)}
 							   isDownloading={this.state.downloadingImages.has(value.name)}
 							   key={value.name}
+							   downloaded={this.state.allDownloadedImages.has(value.name)}
 					/>
 				</Col>
 			));
@@ -261,14 +286,14 @@ class MainWindow extends React.Component<Props, State>
 												{
 													<div style={
 													{
-														paddingTop:'39vh',
-														paddingBottom:'39vh',
-														paddingLeft:'39vw',
-														paddingRight:'39vw',
+														paddingTop:'40vh',
+														paddingBottom:'40vh',
+														paddingLeft:'40vw',
+														paddingRight:'40vw',
 														position: 'absolute',
 														top: 0,
 														left: 0,
-														zIndex: 99,
+														zIndex: 101,
 														backgroundColor: 'rgba(0, 0, 0, 0.8)'
 													}}
 													className='align-content-center'
