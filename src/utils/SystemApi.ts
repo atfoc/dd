@@ -15,6 +15,7 @@ function downloadImage(img: Image, resolution: string):void
 			ipcRenderer.send(Channels.downloadImage, url, name);
 		})
 		.catch(reason => console.log(reason));
+	addToDb(img, 'image');
 }
 
 function loadImagesFromDb():void
@@ -22,4 +23,9 @@ function loadImagesFromDb():void
 	ipcRenderer.send(Channels.loadImagesFromDb);
 }
 
-export {downloadImage, loadImagesFromDb};
+function addToDb(img: Image, type:string)
+{
+	ipcRenderer.send(Channels.addToDb, img, type);
+}
+
+export {downloadImage, loadImagesFromDb, addToDb};

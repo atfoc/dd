@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import  axios from 'axios';
 import {Channels} from "./src/utils/Channels";
 import * as Datastore from 'nedb';
+import {isImageLike} from "./src/models/Image";
 
 
 let mainWindow : BrowserWindow | null = null;
@@ -47,27 +48,39 @@ ipcMain.on(Channels.downloadImage,(event:any, url:any, name:any)=>
 			const nameIndex = name.lastIndexOf('.');
 			event.sender.send(Channels.downloadImage+'Ret', name.substring(0, nameIndex));
 		});
-
-	if(db)
-	{
-		/*Update db to add new image*/
-	}
-
 });
 
 ipcMain.on(Channels.loadImagesFromDb, (event:any)=>
 {
 	if(db)
 	{
-		const values = db.find({}, {name:1}, (err, d)=>
+		db.find({type:'image'}, {name:1}, (err, d)=>
 		{
 			if(err)
 			{
 				console.log(err);
 				return ;
 			}
-			event.sender.send(Channels.loadImagesFromDb+'Ret', d);
+			const ret = d.map((value => value.name));
+			event.sender.send(Channels.loadImagesFromDb+'Ret', ret);
 		});
+	}
+});
+
+ipcMain.on(Channels.addToDb, (event:any, img:any, type:any)=>
+{
+	if(isImageLike(img) && typeof(type) === 'string')
+	{
+		if(db)
+		{
+			db.insert({type:type, ...img}, (err =>
+			{
+				if(err)
+				{
+					console.log(err)
+				}
+			}));
+		}
 	}
 });
 
@@ -130,15 +143,7 @@ function setUpDb()
 	db.loadDatabase();
 	if(!fs.existsSync(path.join(appData, 'db')))
 	{
-		db.ensureIndex({fieldName:'images.name', unique:true}, (err:Error)=>
-		{
-			if(err)
-			{
-				console.log(err);
-			}
-		});
-
-		db.insert({images:[]}, (err, d)=>
+		db.ensureIndex({fieldName:'name', unique:true}, (err:Error)=>
 		{
 			if(err)
 			{

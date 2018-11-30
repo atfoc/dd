@@ -1,7 +1,9 @@
 enum Channels
 {
 	downloadImage = 'downloadImage',
-	loadImagesFromDb = 'loadImagesFromDb'
+	loadImagesFromDb = 'loadImagesFromDb',
+	addToDb='addToDb'
+
 }
 
 
