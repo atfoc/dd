@@ -1,3 +1,4 @@
+import './style.css';
 import * as React from 'react';
 import {State, Props} from "./State";
 import {setImgUrl} from './State';
@@ -44,9 +45,10 @@ class ImageShow extends React.Component<Props, State>
 		{
 			return null;
 		}
+		const className = this.props.downloaded ? 'imageshow-downloaded' : '';
 
 		return (
-			<Card style={{width:'300px'}}>
+			<Card style={{width:'300px'}} className={className}>
 				<CardImg top width='300px' src={this.state.imgUrl}/>
 				<CardBody>
 					<Row className='justify-content-end'>

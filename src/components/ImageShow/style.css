@@ -1,0 +1,9 @@
+.imageshow-downloaded
+{
+    opacity: 0.5;
+}
+
+.imageshow-downloaded:hover
+{
+    opacity: 1;
+}
