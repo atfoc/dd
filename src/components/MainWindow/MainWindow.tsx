@@ -153,7 +153,7 @@ class MainWindow extends React.Component<Props, State>
 			}
 
 			this.api.getImages(this.state.resolution, cat, pageToLoad)
-				.then(value => this.onImagesRecived(value, direction))
+				.then(value => this.onImagesReceived(value, direction))
 				.catch(reason =>
 				{
 					console.log(reason);
@@ -186,7 +186,7 @@ class MainWindow extends React.Component<Props, State>
 
 	}
 
-	onImagesRecived(images:Array<Image>, direction:number):void
+	onImagesReceived(images:Array<Image>, direction:number):void
 	{
 		if(direction < 0)
 		{
@@ -234,8 +234,20 @@ class MainWindow extends React.Component<Props, State>
 
 	renderImages():React.ReactNode
 	{
-		const images = this.state.images.map((value,index) => (
-				<Col  sm='12' md='6' lg='4' className='mt-2'>
+		const images = this.state.images.map((value,index) =>
+		{
+			let id = '';
+			if((index+1) % 15 === 0)
+			{
+				id = 'last-in-page';
+			}
+			else if(index % 15 === 0)
+			{
+				id = 'first-in-page';
+			}
+
+			return (
+				<Col  sm='12' md='6' lg='4' className='mt-2' id={id}>
 					<ImageShow image={value}
 							   onImageDownload={()=>this.onImageDownload(index)}
 							   isDownloading={this.state.downloadingImages.has(value.name)}
@@ -243,7 +255,8 @@ class MainWindow extends React.Component<Props, State>
 							   downloaded={this.state.allDownloadedImages.has(value.name)}
 					/>
 				</Col>
-			));
+			);
+		});
 
 		return (
 			<React.Fragment>
