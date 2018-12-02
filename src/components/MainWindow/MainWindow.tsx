@@ -237,11 +237,11 @@ class MainWindow extends React.Component<Props, State>
 		const images = this.state.images.map((value,index) =>
 		{
 			let id = '';
-			if((index+1) % 15 === 0)
+			if((index+1) % MainWindow.numOfImagesPerPage === 0)
 			{
 				id = 'last-in-page';
 			}
-			else if(index % 15 === 0)
+			else if(index % MainWindow.numOfImagesPerPage === 0)
 			{
 				id = 'first-in-page';
 			}
