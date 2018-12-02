@@ -1,12 +1,6 @@
 import * as React from 'react';
 import {State, Props} from './State';
 
-/*TODO:
- * Make it so that it has indicators hasNext hasPrevious instead of hasMore
- * Make it call loadPrevious and display ender
- * Side note: This will require you to implement appendImages prependImages
- * as well as keeping track of first loaded and last loaded page and api to
- * get number of pages*/
 
 class InfiniteScroll extends React.Component<Props, State>
 {
