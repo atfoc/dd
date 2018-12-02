@@ -44,7 +44,7 @@ class InfiniteScroll extends React.Component<Props, State>
 				setTimeout(()=>
 				{
 					let ele = this.ref.current!.querySelectorAll('#first-in-page');
-					if(ele.length >= 1)
+					if(ele.length >= 2)
 					{
 						ele[1].scrollIntoView(true);
 					}
