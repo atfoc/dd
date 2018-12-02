@@ -45,15 +45,16 @@ class ImageShow extends React.Component<Props, State>
 		{
 			return null;
 		}
-		const className = this.props.downloaded ? 'imageshow-downloaded' : '';
+		const btnColor = this.props.downloaded ? 'success' : 'primary';
 
 		return (
-			<Card style={{width:'300px'}} className={className}>
-				<CardImg top width='300px' src={this.state.imgUrl}/>
+			<Card style={{width:'300px'}} >
+				<CardImg top width='300px' src={this.state.imgUrl}
+						 style={{border:'1px solid black'}}/>
 				<CardBody>
 					<Row className='justify-content-end'>
 						<Col xs='auto'>
-							<Button color='primary' size='sm'
+							<Button color={btnColor} size='sm'
 									onClick={this.props.onImageDownload}
 							>
 								{
